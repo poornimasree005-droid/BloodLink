@@ -69,7 +69,11 @@ exports.getDonors = async (req, res, next) => {
 
     // By default, only show donors who are "Available" unless explicitly requested otherwise
     if (availability && availability !== 'All') {
-      query.availability = availability;
+      if (availability === 'Unavailable') {
+        query.availability = { $in: ['Unavailable', 'Donated Recently'] };
+      } else {
+        query.availability = availability;
+      }
     } else if (!availability) {
       query.availability = 'Available';
     }

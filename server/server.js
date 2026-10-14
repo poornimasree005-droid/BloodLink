@@ -29,6 +29,7 @@ connectDB().then(async () => {
 // Mount Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
+app.get('/api/donors', require('./controllers/userController').getDonors);
 app.use('/api/requests', require('./routes/requestRoutes'));
 app.use('/api/donations', require('./routes/donationRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));

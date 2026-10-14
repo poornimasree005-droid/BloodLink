@@ -56,8 +56,14 @@ export default function FindDonorsPage() {
       if (availability !== 'All') params.append('availability', availability);
       if (search) params.append('search', search);
 
-      const res = await API.get(`/donors?${params.toString()}`);
-      if (res.data.success) {
+      // Query /users/donors endpoint with fallback to /donors
+      let res;
+      try {
+        res = await API.get(`/users/donors?${params.toString()}`);
+      } catch (apiErr) {
+        res = await API.get(`/donors?${params.toString()}`);
+      }
+      if (res?.data?.success) {
         setDonors(res.data.data);
       }
     } catch (err) {
@@ -243,7 +249,8 @@ export default function FindDonorsPage() {
               >
                 <option value="Available">Available to Donate</option>
                 <option value="All">All Statuses (Including Unavailable)</option>
-                <option value="Unavailable font-normal text-slate-500">Currently Unavailable</option>
+                <option value="Unavailable">Currently Unavailable</option>
+                <option value="Donated Recently">Donated Recently</option>
               </select>
             </div>
           </form>

@@ -6,6 +6,11 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
+      '/api/donors': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/donors/, '/api/users/donors'),
+      },
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,

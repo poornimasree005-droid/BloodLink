@@ -9,9 +9,12 @@ node_modules/
 client/.env
 server/.env
 
-# Build files
+# Build files and deployment caches
 dist/
+**/dist/
 build/
+.netlify/
+.vercel/
 
 # Logs
 npm-debug.log*

@@ -27,6 +27,7 @@ app.use(
       if (
         allowedOrigins.indexOf(origin) !== -1 ||
         origin.endsWith('.netlify.app') ||
+        origin.endsWith('.vercel.app') ||
         process.env.FRONTEND_URL === origin
       ) {
         return callback(null, true);

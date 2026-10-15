@@ -28,20 +28,17 @@ const connectDB = async () => {
     console.warn(`[Database] Local MongoDB not available: ${error.message}`);
   }
 
-  // In-memory fallback for non-production environments
-  if (process.env.NODE_ENV !== 'production') {
-    try {
-      const { MongoMemoryServer } = require('mongodb-memory-server');
-      mongoServer = await MongoMemoryServer.create();
-      const memUri = mongoServer.getUri();
-      const conn = await mongoose.connect(memUri);
-      console.log(`[Database] In-Memory MongoDB Server Connected: ${conn.connection.host}`);
-      return conn;
-    } catch (memError) {
-      console.warn(`[Database] In-Memory Mongo Server skipped: ${memError.message}`);
-    }
-  } else {
-    console.warn(`[Database] Running in production mode without MONGO_URI. API will run, but database operations require MONGO_URI environment variable.`);
+  // In-memory fallback for zero-setup execution if cloud and local MongoDB are not available
+  try {
+    const { MongoMemoryServer } = require('mongodb-memory-server');
+    mongoServer = await MongoMemoryServer.create();
+    const memUri = mongoServer.getUri();
+    const conn = await mongoose.connect(memUri);
+    console.log(`[Database] In-Memory MongoDB Server Connected: ${conn.connection.host}`);
+    return conn;
+  } catch (memError) {
+    console.warn(`[Database] In-Memory Mongo Server skipped/unavailable: ${memError.message}`);
+    console.warn(`[Database] Note: For persistent production data, configure MONGO_URI in your Render environment variables.`);
   }
 };
 

@@ -31,21 +31,23 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const res = await API.post('/auth/login', { email, password });
-    if (res.data.success) {
-      localStorage.setItem('token', res.data.token);
-      setToken(res.data.token);
-      setUser(res.data.user);
+    if (!res.data || !res.data.success) {
+      throw new Error(res.data?.message || 'Invalid email or password. Please check your credentials.');
     }
+    localStorage.setItem('token', res.data.token);
+    setToken(res.data.token);
+    setUser(res.data.user);
     return res.data;
   };
 
   const register = async (formData) => {
     const res = await API.post('/auth/register', formData);
-    if (res.data.success) {
-      localStorage.setItem('token', res.data.token);
-      setToken(res.data.token);
-      setUser(res.data.user);
+    if (!res.data || !res.data.success) {
+      throw new Error(res.data?.message || 'Registration failed. Please check your inputs.');
     }
+    localStorage.setItem('token', res.data.token);
+    setToken(res.data.token);
+    setUser(res.data.user);
     return res.data;
   };
 

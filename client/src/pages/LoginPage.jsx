@@ -31,7 +31,9 @@ export default function LoginPage() {
       }
     } catch (err) {
       setError(
-        err.response?.data?.message || 'Invalid email or password. Please check your credentials.'
+        err.response?.data?.message ||
+        err.message ||
+        'Invalid email or password. Please check your credentials.'
       );
     } finally {
       setLoading(false);

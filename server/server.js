@@ -40,8 +40,11 @@ app.use(
 
 // Health check endpoints
 app.get('/', (req, res) => {
+  const mongoose = require('mongoose');
+  const isDbConnected = Boolean(mongoose.connection && mongoose.connection.readyState === 1);
   res.status(200).json({
     status: 'Active',
+    database: isDbConnected ? 'Connected' : 'Disconnected',
     system: 'BloodLink Backend API',
     endpoints: {
       status: '/api/status',
@@ -53,7 +56,12 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK' });
+  const mongoose = require('mongoose');
+  const isDbConnected = Boolean(mongoose.connection && mongoose.connection.readyState === 1);
+  res.status(200).json({
+    status: 'OK',
+    database: isDbConnected ? 'Connected' : 'Disconnected',
+  });
 });
 
 // Connect Database & Seed initial data

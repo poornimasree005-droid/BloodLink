@@ -60,6 +60,16 @@ exports.updateProfile = async (req, res, next) => {
 // @access  Public / Private
 exports.getDonors = async (req, res, next) => {
   try {
+    const mongoose = require('mongoose');
+    if (!mongoose.connection || mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database is currently connecting or unavailable. Please verify MONGO_URI in your backend environment variables.',
+        count: 0,
+        data: [],
+      });
+    }
+
     const { bloodGroup, city, area, availability, search } = req.query;
 
     const query = {

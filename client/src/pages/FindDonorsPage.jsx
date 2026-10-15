@@ -21,6 +21,7 @@ export default function FindDonorsPage() {
 
   const [donors, setDonors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState('');
 
   // Filters
   const [bloodGroup, setBloodGroup] = useState('All');
@@ -49,6 +50,7 @@ export default function FindDonorsPage() {
   const fetchDonors = async () => {
     try {
       setLoading(true);
+      setFetchError('');
       const params = new URLSearchParams();
       if (bloodGroup !== 'All') params.append('bloodGroup', bloodGroup);
       if (city) params.append('city', city);
@@ -65,9 +67,12 @@ export default function FindDonorsPage() {
       }
       if (res?.data?.success) {
         setDonors(res.data.data);
+      } else {
+        setFetchError(res?.data?.message || 'Unable to retrieve donor list from server.');
       }
     } catch (err) {
       console.error('Error loading donors', err);
+      setFetchError(err.response?.data?.message || err.message || 'Cannot connect to backend server.');
     } finally {
       setLoading(false);
     }
@@ -276,6 +281,22 @@ export default function FindDonorsPage() {
             </div>
           </div>
         </div>
+
+        {/* Error notification banner */}
+        {fetchError && (
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between gap-3 text-xs text-amber-800">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
+              <span>{fetchError}</span>
+            </div>
+            <button
+              onClick={fetchDonors}
+              className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shrink-0"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* Donors Grid */}
         {loading ? (

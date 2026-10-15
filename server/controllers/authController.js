@@ -103,6 +103,14 @@ exports.login = async (req, res, next) => {
       });
     }
 
+    const mongoose = require('mongoose');
+    if (!mongoose.connection || mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database is currently connecting or unavailable. Please verify MONGO_URI in your backend environment variables.',
+      });
+    }
+
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
     if (!user) {

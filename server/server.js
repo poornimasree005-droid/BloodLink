@@ -57,7 +57,12 @@ app.get('/health', (req, res) => {
 
 // Connect Database & Seed initial data
 connectDB().then(async () => {
-  await seedData();
+  const mongoose = require('mongoose');
+  if (mongoose.connection && mongoose.connection.readyState === 1) {
+    await seedData();
+  }
+}).catch((err) => {
+  console.warn(`[Startup] Database connection warning: ${err.message}`);
 });
 
 // Mount Routes

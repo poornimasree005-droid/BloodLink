@@ -14,12 +14,46 @@ const app = express();
 app.use(express.json());
 
 // Enable CORS
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'https://unique-lokum-c8f87d.netlify.app',
+];
+
 app.use(
   cors({
-    origin: '*',
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.indexOf(origin) !== -1 ||
+        origin.endsWith('.netlify.app') ||
+        process.env.FRONTEND_URL === origin
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   })
 );
+
+// Health check endpoints
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'Active',
+    system: 'BloodLink Backend API',
+    endpoints: {
+      status: '/api/status',
+      auth: '/api/auth',
+      donors: '/api/donors',
+      requests: '/api/requests',
+    },
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK' });
+});
 
 // Connect Database & Seed initial data
 connectDB().then(async () => {

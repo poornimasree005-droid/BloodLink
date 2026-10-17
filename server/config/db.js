@@ -23,10 +23,14 @@ const connectDB = async () => {
       });
       const hostDesc = mongoUri.includes('127.0.0.1') || mongoUri.includes('localhost') ? 'Local MongoDB' : 'Cloud MongoDB Atlas';
       console.log(`[Database] ${hostDesc} Connected: ${conn.connection.host}`);
+      global.__dbConnectionError = null;
       return conn;
     } catch (error) {
+      global.__dbConnectionError = error.message;
       console.error(`[Database] MongoDB connection error for MONGO_URI: ${error.message}`);
     }
+  } else {
+    global.__dbConnectionError = 'MONGO_URI environment variable is not set in Render environment';
   }
 
   // Try local MongoDB (e.g. for local development) if MONGO_URI was not already local

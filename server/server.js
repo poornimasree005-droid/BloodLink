@@ -64,6 +64,10 @@ app.get(['/health', '/api/health'], (req, res) => {
   res.status(200).json({
     status: 'OK',
     database: isDbConnected ? 'Connected' : 'Disconnected',
+    databaseConfigured: Boolean(process.env.MONGO_URI),
+    databaseDetails: isDbConnected
+      ? `Connected to ${mongoose.connection.host || 'database'}`
+      : (global.__dbConnectionError || 'No connection error recorded'),
     timestamp: new Date().toISOString(),
   });
 });

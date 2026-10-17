@@ -13,3 +13,5 @@ services:
         generateValue: true
       - key: FRONTEND_URL
         value: https://blood-link-zeta-two.vercel.app
+      - key: MONGO_URI
+        sync: false

@@ -40,6 +40,10 @@ exports.updateProfile = async (req, res, next) => {
       }
     });
 
+    if (updates.lastDonationDate === '') {
+      updates.lastDonationDate = null;
+    }
+
     const user = await User.findByIdAndUpdate(req.user._id, updates, {
       new: true,
       runValidators: true,

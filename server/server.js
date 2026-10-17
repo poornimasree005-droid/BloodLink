@@ -38,6 +38,7 @@ app.use(
     credentials: true,
   })
 );
+app.options('*', cors());
 
 // Health check endpoints
 app.get('/', (req, res) => {
@@ -49,6 +50,7 @@ app.get('/', (req, res) => {
     system: 'BloodLink Backend API',
     endpoints: {
       status: '/api/status',
+      health: '/api/health',
       auth: '/api/auth',
       donors: '/api/donors',
       requests: '/api/requests',
@@ -56,12 +58,13 @@ app.get('/', (req, res) => {
   });
 });
 
-app.get('/health', (req, res) => {
+app.get(['/health', '/api/health'], (req, res) => {
   const mongoose = require('mongoose');
   const isDbConnected = Boolean(mongoose.connection && mongoose.connection.readyState === 1);
   res.status(200).json({
     status: 'OK',
     database: isDbConnected ? 'Connected' : 'Disconnected',
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -79,6 +82,7 @@ connectDB().then(async () => {
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.get('/api/donors', require('./controllers/userController').getDonors);
+app.get('/donors', require('./controllers/userController').getDonors);
 app.use('/api/requests', require('./routes/requestRoutes'));
 app.use('/api/donations', require('./routes/donationRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));

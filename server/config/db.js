@@ -2,13 +2,24 @@ const mongoose = require('mongoose');
 
 let mongoServer;
 
+// Lifecycle event listeners
+mongoose.connection.on('connected', () => {
+  console.log('[Database] Mongoose status: Connected');
+});
+mongoose.connection.on('error', (err) => {
+  console.error('[Database] Mongoose status error:', err.message);
+});
+mongoose.connection.on('disconnected', () => {
+  console.warn('[Database] Mongoose status: Disconnected');
+});
+
 const connectDB = async () => {
   const mongoUri = process.env.MONGO_URI;
 
   if (mongoUri) {
     try {
       const conn = await mongoose.connect(mongoUri, {
-        serverSelectionTimeoutMS: 5000,
+        serverSelectionTimeoutMS: 10000,
       });
       const hostDesc = mongoUri.includes('127.0.0.1') || mongoUri.includes('localhost') ? 'Local MongoDB' : 'Cloud MongoDB Atlas';
       console.log(`[Database] ${hostDesc} Connected: ${conn.connection.host}`);

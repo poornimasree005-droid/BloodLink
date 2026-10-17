@@ -101,10 +101,11 @@ app.get('/api/status', (req, res) => {
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
+const HOST = '0.0.0.0';
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, HOST, () => {
   console.log(`=============================================================`);
-  console.log(`🩸 BloodLink Backend Server running on port ${PORT}`);
+  console.log(`🩸 BloodLink Backend Server running on http://${HOST}:${PORT}`);
   console.log(`📡 Base API URL: http://localhost:${PORT}/api`);
   console.log(`=============================================================`);
 });

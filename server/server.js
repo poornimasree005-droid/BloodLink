@@ -17,6 +17,7 @@ app.use(express.json());
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
+  'https://blood-link-zeta-two.vercel.app',
   'https://unique-lokum-c8f87d.netlify.app',
 ];
 

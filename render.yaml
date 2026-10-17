@@ -12,4 +12,4 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        value: https://unique-lokum-c8f87d.netlify.app
+        value: https://blood-link-zeta-two.vercel.app

@@ -20,8 +20,14 @@ const runTests = async () => {
   console.log('🧪 Starting BloodLink Backend Automated Test Suite');
   console.log('=============================================================\n');
 
-  // 1. Connect to DB
-  await connectDB();
+  // 1. Connect to DB (uses MONGO_URI or local DB; falls back to MongoMemoryServer strictly for testing)
+  let conn = await connectDB();
+  if (!conn && (!mongoose.connection || mongoose.connection.readyState !== 1)) {
+    console.log('[Test Setup] Starting MongoMemoryServer for isolated automated tests...');
+    const { MongoMemoryServer } = require('mongodb-memory-server');
+    const mongoServer = await MongoMemoryServer.create();
+    await mongoose.connect(mongoServer.getUri());
+  }
   const seedData = require('../utils/seeder');
   await seedData();
 

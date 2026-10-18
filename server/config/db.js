@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-let mongoServer;
-
 // Lifecycle event listeners
 mongoose.connection.on('connected', () => {
   console.log('[Database] Mongoose status: Connected');
@@ -21,51 +19,37 @@ const connectDB = async () => {
       const conn = await mongoose.connect(mongoUri, {
         serverSelectionTimeoutMS: 10000,
       });
-      const hostDesc = mongoUri.includes('127.0.0.1') || mongoUri.includes('localhost') ? 'Local MongoDB' : 'Cloud MongoDB Atlas';
+      const isCloud = !mongoUri.includes('127.0.0.1') && !mongoUri.includes('localhost');
+      const hostDesc = isCloud ? 'Cloud MongoDB Atlas' : 'Local MongoDB';
       console.log(`[Database] ${hostDesc} Connected: ${conn.connection.host}`);
       global.__dbConnectionError = null;
+      global.__dbMode = hostDesc;
       return conn;
     } catch (error) {
-      global.__dbConnectionError = error.message;
       console.error(`[Database] MongoDB connection error for MONGO_URI: ${error.message}`);
+      global.__dbConnectionError = error.message;
     }
   } else {
-    global.__dbConnectionError = 'MONGO_URI environment variable is not set in Render environment';
+    global.__dbConnectionError = 'MONGO_URI environment variable is not configured in Render environment variables.';
+    console.warn('[Database] Warning: MONGO_URI is not set in environment variables.');
   }
 
-  // Try local MongoDB (e.g. for local development) if MONGO_URI was not already local
-  if (!mongoUri || (!mongoUri.includes('127.0.0.1') && !mongoUri.includes('localhost'))) {
+  // In non-production local development, fallback to local MongoDB service if MONGO_URI was not set
+  if (process.env.NODE_ENV !== 'production') {
     try {
       const conn = await mongoose.connect('mongodb://127.0.0.1:27017/bloodlink', {
-        serverSelectionTimeoutMS: 2000,
+        serverSelectionTimeoutMS: 2500,
       });
-      console.log(`[Database] Local MongoDB Connected: ${conn.connection.host}`);
+      console.log(`[Database] Local Development MongoDB Connected: ${conn.connection.host}`);
+      global.__dbConnectionError = null;
+      global.__dbMode = 'Local MongoDB (Development)';
       return conn;
     } catch (error) {
       console.warn(`[Database] Local MongoDB not available: ${error.message}`);
     }
   }
 
-  // In-memory fallback for zero-setup execution if cloud and local MongoDB are not available
-  try {
-    const memoryServerPromise = async () => {
-      const { MongoMemoryServer } = require('mongodb-memory-server');
-      mongoServer = await MongoMemoryServer.create();
-      const memUri = mongoServer.getUri();
-      const conn = await mongoose.connect(memUri);
-      console.log(`[Database] In-Memory MongoDB Server Connected: ${conn.connection.host}`);
-      return conn;
-    };
-
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('In-memory MongoDB startup timed out after 8s')), 8000)
-    );
-
-    return await Promise.race([memoryServerPromise(), timeoutPromise]);
-  } catch (memError) {
-    console.warn(`[Database] In-Memory Mongo Server skipped/unavailable: ${memError.message}`);
-    console.warn(`[Database] Note: For persistent production data, configure MONGO_URI in your Render environment variables.`);
-  }
+  return null;
 };
 
 module.exports = connectDB;

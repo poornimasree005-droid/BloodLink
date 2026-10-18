@@ -13,6 +13,14 @@ mongoose.connection.on('disconnected', () => {
 
 const connectDB = async () => {
   const mongoUri = process.env.MONGO_URI;
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  // In production on Render, reject localhost/127.0.0.1 immediately with clear guidance
+  if (isProduction && mongoUri && (mongoUri.includes('127.0.0.1') || mongoUri.includes('localhost'))) {
+    global.__dbConnectionError = 'In production on Render, MONGO_URI cannot be localhost (127.0.0.1). Please configure your cloud MongoDB Atlas connection string (mongodb+srv://...) in Render environment variables.';
+    console.error(`[Database] Configuration Error: ${global.__dbConnectionError}`);
+    return null;
+  }
 
   if (mongoUri) {
     try {

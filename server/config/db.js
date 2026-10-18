@@ -55,7 +55,12 @@ const connectDB = async () => {
   try {
     console.log('[Database] Initializing autonomous zero-configuration embedded MongoDB engine...');
     const { MongoMemoryServer } = require('mongodb-memory-server');
+    const binaryOpts = {};
+    if (process.platform === 'linux') {
+      binaryOpts.version = '7.0.14';
+    }
     const memServer = await MongoMemoryServer.create({
+      binary: binaryOpts,
       instance: {
         dbName: 'bloodlink',
       },

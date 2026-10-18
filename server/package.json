@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "seed": "node utils/seeder.js",
     "test": "node test/api.test.js",
-    "postinstall": "node -e \"require('mongodb-memory-server').MongoMemoryServer.create({ binary: { version: '6.0.14' } }).then(s => s.stop()).catch(e => console.warn(e))\""
+    "postinstall": "node -e \"const opts = process.platform === 'linux' ? { binary: { version: '7.0.14' } } : {}; require('mongodb-memory-server').MongoMemoryServer.create(opts).then(s => s.stop()).catch(e => console.warn(e))\""
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
